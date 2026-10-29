@@ -1,30 +1,34 @@
-def apply_coupon(cart_total, coupon_code, is_member):
-    """
-    Applies a coupon to the cart total.
-    """
+def coupon_discount(code, cart_total, is_new_user, day):
     if cart_total <= 0:
-        return 0.0
+        raise ValueError("empty cart")
+    if code == "WELCOME10":
+        if is_new_user:
+            return cart_total * 0.10
+        return 0
+    if code == "WEEKEND20":
+        if day in ("sat", "sun"):
+            if cart_total >= 500:
+                return cart_total * 0.20
+            return 50
+        return 0
+    if code == "FLAT100":
+        if cart_total > 300:
+            return 100
+        return 0
+    return 0
 
-    discount = 0.0
+def best_discount(codes, cart_total, is_new_user, day):
+    best = 0
+    for code in codes:
+        value = coupon_discount(code, cart_total, is_new_user, day)
+        if value > best:
+            best = value
+    cap = cart_total * 0.4
+    if best > cap:
+        return cap
+    return best
 
-    if coupon_code == "SAVE10":
-        discount = cart_total * 0.10
-    elif coupon_code == "SAVE20":
-        if cart_total > 100:
-            discount = cart_total * 0.20
-        else:
-            discount = 0.0 
-    elif coupon_code == "FREESHIP":
-        if is_member:
-            discount = 5.0
-        else:
-            discount = 0.0 
-    else:
-        discount = 0.0 
-
-    final_price = cart_total - discount
-    
-    if final_price < 0:
-        return 0.0
-        
-    return final_price
+def is_expired(today, start, days_valid):
+    if days_valid <= 0:
+        return True
+    return (today - start).days > days_valid
