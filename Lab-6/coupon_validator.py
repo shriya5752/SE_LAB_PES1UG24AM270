@@ -31,4 +31,4 @@ def best_discount(codes, cart_total, is_new_user, day):
 def is_expired(today, start, days_valid):
     if days_valid <= 0:
         return True
-    return (today - start).days > days_valid
+    return today - start > days_valid
